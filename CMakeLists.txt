@@ -34,7 +34,7 @@ set(ALL_LIBS
 
 set(CMAKE_CXX_STANDARD 11)
 
-set(SOURCE_FILES main.cpp myGLWidget.cpp myGLWidget.h myWindow.cpp myWindow.h)
+set(SOURCE_FILES main.cpp myGLWidget.cpp myGLWidget.h myWindow.cpp myWindow.h Shader.cpp Shader.h)
 
 add_executable(tuto_opengl ${SOURCE_FILES})
 

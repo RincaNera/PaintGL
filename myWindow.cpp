@@ -4,7 +4,7 @@
 #include "myWindow.h"
 
 myWindow::myWindow(QGLFormat &format, QWidget *parent)
-        : myGLWidget(format, 500, parent, name) {
+        : myGLWidget(format, 500, parent, (char *) "PaintGL") {
 }
 
 void myWindow::initializeGL() {
@@ -12,37 +12,8 @@ void myWindow::initializeGL() {
     glewExperimental = GL_TRUE;
     // Initialize GLEW to setup the OpenGL Function pointers
     glewInit();
-    // Vertex Shader
-    GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-    glCompileShader(vertexShader);
-    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-    if (!success) {
-        glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
-    }
-    // Fragment Shader
-    GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-    glCompileShader(fragmentShader);
-    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-    if (!success) {
-        glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
-    }
-    // Link Shaders
-    shaderProgram = glCreateProgram();
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-    glLinkProgram(shaderProgram);
-    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-    if (!success) {
-        glGetShaderInfoLog(shaderProgram, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
-    }
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
-
+    //Shader
+    shader = new Shader("shaders/vertexShader.vs", "shaders/fragmentShader.vs");
     // Buffers
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
@@ -78,11 +49,11 @@ void myWindow::paintGL() {
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    glUseProgram(shaderProgram);
+    shader->Use();
 
     GLfloat timeValue = QTime().currentTime().msec()*0.001f;
     GLfloat greenValue = (GLfloat)(sin(timeValue*M_PI)/2 + 0.5f);
-    GLint vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
+    GLint vertexColorLocation = glGetUniformLocation(shader->Program, "ourColor");
     glUniform4f(vertexColorLocation, greenValue, greenValue*0.6f, 0.0f, 1.0f);
 
     glBindVertexArray(VAO);

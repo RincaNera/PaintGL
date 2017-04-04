@@ -2,6 +2,7 @@
 #define MYWINDOW_H
 
 #include "myGLWidget.h"
+#include "Shader.h"
 
 #include <QTime>
 
@@ -17,26 +18,8 @@ public:
     void paintGL();
 
 private:
-    char *name = "OpenGL";
-    GLuint shaderProgram;
     GLuint VBO, VAO, EBO;
-    GLint success;
-    GLchar infoLog[512];
-
-    const GLchar *vertexShaderSource = "#version 330 core\n"
-            "layout (location = 0) in vec3 position;\n"
-            "void main()\n"
-            "{\n"
-            "gl_Position = vec4(position.x, position.y, position.z, 1.0);\n"
-            "}\0";
-
-    const GLchar *fragmentShaderSource = "#version 330 core\n"
-            "out vec4 color;\n"
-            "uniform vec4 ourColor;\n"
-            "void main()\n"
-            "{\n"
-            "color = ourColor;\n"
-            "}\n\0";
+    Shader *shader = NULL;
 
     GLfloat vertices[20] = {
             -0.5f, -0.5f, 0.f,
