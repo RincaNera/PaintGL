@@ -6,6 +6,10 @@
 
 #include <QTime>
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 class myWindow : public myGLWidget {
 Q_OBJECT
 public:
@@ -18,9 +22,9 @@ public:
     void paintGL();
 
 private:
-    GLuint VBO, VAO, EBO;
+    GLuint VBO, VAO, EBO, texture;
     Shader *shader = NULL;
-    GLuint texture;
+    GLfloat speed = 0.005f;
 
     GLfloat vertices[32] = {
             -0.5f, -0.5f, 0.f,  0.f, 0.f,   // Bottom left

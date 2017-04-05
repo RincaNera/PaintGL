@@ -2,10 +2,6 @@
 
 #include <SOIL.h>
 
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-
 myWindow::myWindow(QGLFormat &format, QWidget *parent)
         : myGLWidget(format, 500, parent, (char *) "PaintGL") {
 }
@@ -71,10 +67,16 @@ void myWindow::paintGL() {
 
     shader->Use();
 
-    //GLfloat timeValue = QTime().currentTime().msec()*0.001f;
-    //GLfloat greenValue = (GLfloat)(sin(timeValue*M_PI)/2 + 0.5f);
-    //GLint vertexColorLocation = glGetUniformLocation(shader->Program, "ourColor");
-    //glUniform4f(vertexColorLocation, greenValue, greenValue*0.6f, 0.0f, 1.0f);*/
+    GLfloat timeValue = QTime().currentTime().msecsSinceStartOfDay();
+    GLfloat greenValue = (GLfloat)(sin(timeValue*M_PI)/2 + 0.5f);
+    GLint vertexColorLocation = glGetUniformLocation(shader->Program, "ourColor");
+    glUniform4f(vertexColorLocation, greenValue, greenValue*0.6f, 0.0f, 1.0f);
+
+    glm::mat4 trans;
+    trans = glm::translate(trans, glm::vec3(0.f, 0.f, 0.f));
+    trans = glm::rotate(trans, (GLfloat)(QTime().currentTime().msecsSinceStartOfDay()*speed), glm::vec3(0.f, 1.f, 0.f));
+    GLint transformLoc = glGetUniformLocation(shader->Program, "transform");
+    glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture);
