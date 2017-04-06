@@ -5,6 +5,7 @@ urlGlfw=https://github.com/glfw/glfw/releases/download/3.2.1/glfw-3.2.1.zip
 urlSoil=http://www.lonesock.net/files/soil.zip
 #Le site de GLM a tendance à être down donc Google Drive
 urlGlm="https://drive.google.com/uc?export=download&id=0BzQv_tPVTNPRX1BmdEg2ZFZwdFE"
+urlCMake=https://cmake.org/files/v3.8/cmake-3.8.0-rc4.tar.gz
 
 installSuccessful="true"
 
@@ -42,7 +43,7 @@ installGlew() {
       echo "GLEW INSTALL SUCCESSFUL"
     else
       echo "GLEW INSTALL FAILED"
-      installsuccessful="false"
+      installSuccessful="false"
     fi
     cd ../..
   fi
@@ -65,7 +66,7 @@ installGlfw() {
       echo "GLFW INSTALL SUCCESSFUL"
     else
       echo "GLFW INSTALL FAILED"
-      instalsuccessful="false"
+      installSuccessful="false"
     fi
     cd ..
   fi
@@ -76,21 +77,48 @@ installSoil() {
   then 
     isConfirmed="true"
   else
-    isConfirmed=`confirm "~/bin/Simple OpenGL Image Library  is already there do you wish to re-run install ? [y/N] "`
+    isConfirmed=`confirm "~/bin/soil is already there do you wish to re-run install ? [y/N] "`
   fi
   if [ "$isConfirmed" = "true" ]
   then
-    cd Simple\ OpenGL\ Image\ Library/projects/makefile
-    make -j4
+    cd soil/projects/makefile
+    mv makefile makefile2
+    cat makefile2 | sed -e 's|/usr/local|~/bin/soil|' | sed '/$(COPIER) $(BIN) $(LOCAL)/d' > Makefile
+
+    mkdir obj
+    make -j4 install
     if [ $? -eq 0 ]
     then
       echo "SOIL INSTALL SUCCESSFUL"
     else
       echo "SOIL INSTALL FAILED"
-      installsuccessful="false"
+      installSuccessful="false"
     fi
     cd ../../..
   fi
+}
+
+installCMake() {
+echo "Building latest CMake, this will take a while..."
+wget $urlCMake  2> /dev/null && tar -xvzf cmake-3.8.0-rc4.tar.gz > /dev/null && rm cmake-3.8.0-rc4.tar.gz
+cd cmake-3.8.0-rc4
+./bootstrap > /dev/null && gmake > /dev/null 2>&1
+if [ $? -eq 0 ]
+then
+  echo "Lastest cmake built, adding ~/bin/cmake-3.8.0-rc4 to path..."
+  isConfirmed=`confirm "Do you want to you want to add this version of cmake permanently to your PATH ? [y/N] "`
+  if [ $"isConfirmed" = "true" ]
+  then
+    echo "Note: the bashrc file is reset on every reboot at the university."
+    echo "export PATH=~/bin/cmake-3.8.0-rc4/bin:$PATH" >> .bashrc
+    source ~/.bashrc/
+  fi
+  export PATH=~/bin/cmake-3.8.0-rc4/bin:$PATH
+else
+  echo "Lastest cmake build failed, exiting..."
+  exit 0
+fi
+cd ..
 }
 
 # Check du répertoire ~/bin
@@ -119,7 +147,7 @@ if [ -d glew-2.0.0 ]
 then
   installGlew false
 else
-  wget $urlGlew -O glew-2.0.0.zip && unzip glew2.0.0.zip && rm glew.2.0.0.zip
+  wget $urlGlew -O glew-2.0.0.zip 2> /dev/null && unzip glew-2.0.0.zip > /dev/null/ && rm glew-2.0.0.zip
   installGlew true
 fi
 
@@ -128,16 +156,16 @@ if [ -d glfw-3.2.1 ]
 then
   installGlfw false
 else
-  wget $urlGlfw && unzip glfw-3.2.1.zip && rm glfw-3.2.1.zip
+  wget $urlGlfw 2> /dev/null && unzip glfw-3.2.1.zip > /dev/null/ && rm glfw-3.2.1.zip
   installGlfw true
 fi
 
 # Check de Soil
-if [ -d Simple\ OpenGL\ Image\ Library ]
+if [ -d soil ]
 then
   installSoil false
 else
-  wget $urlSoil && unzip soil.zip && rm soil.zip
+  wget $urlSoil 2> /dev/null && unzip soil.zip > /dev/null && rm soil.zip && mv Simple\ OpenGL\ Image\ Library soil
   installSoil true
 fi
 
@@ -146,7 +174,7 @@ if [ -d glm ]
 then
   echo "~/bin/glm is already there, no need to re-install."
 else
-  wget $urlGlm -O glm.zip && unzip glm.zip && rm glm.zip
+  wget $urlGlm -O glm.zip && unzip glm.zip > /dev/null && rm glm.zip
   echo "GLM INSTALL SUCCESSFUL"
 fi
 
@@ -156,8 +184,27 @@ then
   isConfirmed=`confirm "Do you wish to build the project ? [y/N] "`
   if [ "$isConfirmed" = "true" ]
   then
+    # Check cmake version
+    cMakeVersion=`cmake --version | head -n 1 | cut -d ' ' -f 3`
+    cMakeMajor=`echo $cMakeVersion | cut -d '.' -f 1`
+    cMakeMinor=`echo $cMakeVersion | cut -d '.' -f 2`
+    echo "Need at least cmake version 3.6, you have $cMakeVersion"
+    if [ $cMakeMajor -le 3 ]
+    then
+      if [ $cMakeMajor -eq 3 ]
+      then
+        if [ $cMakeMinor -lt 6 ]
+	then
+	  installCMake
+	fi
+      else
+        installCMake
+      fi
+    fi
+
+    # Building project
     cd $dir
-    make CMakeLists.txt && make
+    cmake CMakeLists.txt && make
     if [ $? -eq 0 ]
     then
         echo "Project build successful. Exiting..."
