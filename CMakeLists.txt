@@ -8,12 +8,12 @@ include_directories(
         ~/bin/glm/
         ~/bin/glfw-3.2.1/include/
         ~/bin/glew-2.0.0/include/
-        ~/bin/Simple_OpenGL_Image_Library/src/
+        ~/bin/soil/src/
 )
 
 link_directories(
         ~/bin/glew-2.0.0/build/lib/
-        ~/bin/Simple_OpenGL_Image_Library/lib/
+        ~/bin/soil/lib/
 )
 
 find_package(OpenGL REQUIRED)
