@@ -147,7 +147,7 @@ if [ -d glew-2.0.0 ]
 then
   installGlew false
 else
-  wget $urlGlew -O glew-2.0.0.zip 2> /dev/null && unzip glew-2.0.0.zip > /dev/null/ && rm glew-2.0.0.zip
+  wget $urlGlew -O glew-2.0.0.zip 2> /dev/null && unzip glew-2.0.0.zip > /dev/null && rm glew-2.0.0.zip
   installGlew true
 fi
 
@@ -156,7 +156,7 @@ if [ -d glfw-3.2.1 ]
 then
   installGlfw false
 else
-  wget $urlGlfw 2> /dev/null && unzip glfw-3.2.1.zip > /dev/null/ && rm glfw-3.2.1.zip
+  wget $urlGlfw 2> /dev/null && unzip glfw-3.2.1.zip > /dev/null && rm glfw-3.2.1.zip
   installGlfw true
 fi
 
@@ -174,7 +174,7 @@ if [ -d glm ]
 then
   echo "~/bin/glm is already there, no need to re-install."
 else
-  wget $urlGlm -O glm.zip && unzip glm.zip > /dev/null && rm glm.zip
+  wget $urlGlm -O glm.zip 2> /deV/null && unzip glm.zip > /dev/null && rm glm.zip
   echo "GLM INSTALL SUCCESSFUL"
 fi
 
